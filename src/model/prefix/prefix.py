@@ -1,0 +1,14 @@
+from src.core.database import Base
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, DateTime
+
+class Prefix(Base):    
+    __tablename__ = "prefix"
+    
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    
+    prefix_name: Mapped[str] = mapped_column("prefix", unique= True, nullable= False)
+    
+    required_prefix: Mapped[str] = mapped_column(Boolean, default= False)
+    
+    create_at: Mapped[DateTime] = mapped_column(DateTime)
