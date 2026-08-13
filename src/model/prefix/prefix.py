@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from src.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Boolean, DateTime
@@ -9,6 +11,6 @@ class Prefix(Base):
     
     prefix_name: Mapped[str] = mapped_column("prefix", unique= True, nullable= False)
     
-    required_prefix: Mapped[str] = mapped_column(Boolean, default= False)
+    required_prefix: Mapped[bool] = mapped_column(Boolean, default= False)
     
-    create_at: Mapped[DateTime] = mapped_column(DateTime)
+    create_at: Mapped[datetime] = mapped_column(DateTime, default= datetime.now)

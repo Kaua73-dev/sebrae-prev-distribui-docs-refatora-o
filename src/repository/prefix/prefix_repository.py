@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from src.model.prefix import Prefix
+from src.model.prefix.prefix import Prefix
 
 
 class PrefixRepository:
