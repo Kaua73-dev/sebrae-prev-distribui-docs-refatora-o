@@ -1,6 +1,6 @@
 from pathlib import Path
-from core.config import settings
-from service.preparation.file_block import FileBlock
+from src.core.config import settings
+from src.service.preparation.file_block import FileBlock
 
 class PreparationService:
 
@@ -26,7 +26,7 @@ class PreparationService:
 
     @staticmethod
     def _get_files() -> list[Path]:
-        base_path = Path(settings.BASE_DIR)
+        base_path = Path(settings.FILES_DIR_PATH)
 
 
         files_accepted = (".pdf", ".xls", ".xlsx", ".txt")

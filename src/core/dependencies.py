@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.orm.session import Session
 
-from service.preparation.preparation_service import PreparationService
+from src.service.preparation.preparation_service import PreparationService
 from src.core.database import get_db
 from src.repository.prefix import PrefixRepository
 from src.service.prefix.prefix_service import PrefixService
