@@ -27,6 +27,3 @@ class PrefixController:
     def find_all_prefixes(self) -> list[PrefixResponse]:
         return self.service.find_all_prefixes()
 
-    @router.get("/required", response_model=PrefixResponse)
-    def find_prefix_required_true(self) -> list[PrefixResponse]:
-        return self.service.find_prefix_required_true()
