@@ -19,12 +19,10 @@ class PreparationService:
             files_of_block = [
                 path
                 for path in all_files
-                if self.belong_in_prefix(path.name, prefix.prefix_name)
+                if self._belong_in_prefix(path.name, prefix.prefix_name)
             ]
-
-        blocks.append(FileBlock(prefix=prefix.prefix_name, files=files_of_block))
+            blocks.append(FileBlock(prefix=prefix.prefix_name, files=files_of_block))
         return blocks
-
 
     @staticmethod
     def _get_files() -> list[Path]:
@@ -40,15 +38,15 @@ class PreparationService:
         ]
 
     @staticmethod
-    def belong_in_prefix(file_name: str, prefix: str) -> bool:
+    def _belong_in_prefix(file_name: str, prefix: str) -> bool:
 
         if not file_name.startswith(prefix):
             return False
 
-        if len(file_name) > len(prefix):
+        if len(file_name) == len(prefix):
             return False
 
-        next_char = file_name[len(prefix):]
+        next_char = file_name[len(prefix)]
         return not next_char.isalpha()
 
 
