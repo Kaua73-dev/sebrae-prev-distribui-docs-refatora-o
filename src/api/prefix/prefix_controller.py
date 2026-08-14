@@ -8,7 +8,7 @@ from src.service.prefix.prefix_service import PrefixService
 from fastapi_utils.cbv import cbv
 
 
-router = APIRouter(prefix="/prefixes", tags=["Prefixes"])
+router = APIRouter(prefix="/prefix", tags=["Prefixes"])
 @cbv(router)
 class PrefixController:
 
