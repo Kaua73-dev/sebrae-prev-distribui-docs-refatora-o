@@ -28,7 +28,6 @@ class PreparationService:
     def _get_files() -> list[Path]:
         base_path = Path(settings.FILES_DIR_PATH)
 
-
         files_accepted = (".pdf", ".xls", ".xlsx", ".txt")
 
         return [
@@ -48,5 +47,3 @@ class PreparationService:
 
         next_char = file_name[len(prefix)]
         return not next_char.isalpha()
-
-
