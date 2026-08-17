@@ -22,3 +22,10 @@ class UserEmailRepository:
             .filter(UserEmail.isActive.is_(True))
             .all()
         )
+
+    def find_by_email(self, email: str) -> UserEmail | None:
+        return (
+            self.db.query(UserEmail)
+            .filter(UserEmail.email == email)
+            .first()
+        )
