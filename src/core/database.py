@@ -1,5 +1,8 @@
+from contextlib import contextmanager
+from typing import Iterator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from src.core.config import settings
 
@@ -16,9 +19,17 @@ DATABASE_URL = (
 engine = create_engine(DATABASE_URL, echo=settings.DB_ECHO)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-def get_db():
+def get_db() -> Iterator[Session]:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+@contextmanager
+def new_session() -> Iterator[Session]:
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
