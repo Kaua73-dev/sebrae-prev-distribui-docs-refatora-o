@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.exception.prefix.prefix_exceptions import PrefixAlreadyExistException, PrefixNotFoundException
+from src.exception.prefix.prefix_exceptions import PrefixAlreadyExistException, PrefixNotFoundException, PrefixRequiredException
 from src.model.prefix import Prefix
 from src.repository.prefix import PrefixRepository
 from src.schema.request.prefix import PrefixRequest
@@ -16,7 +16,7 @@ class PrefixService:
         self.session = session
 
     @staticmethod
-    def _normalize_prefix(prefix: str ) -> str:
+    def _normalize_prefix_name(prefix: str ) -> str:
         return prefix.strip().upper()
 
     @staticmethod
@@ -27,15 +27,15 @@ class PrefixService:
     def create_prefix(self, request: PrefixRequest) -> PrefixResponse:
 
         if request.prefix_name is None or request.prefix_name == "":
-            raise ValueError("prefix is required")
+            raise PrefixRequiredException()
 
-        normalized_prefix_name = self._normalize_prefix(request.prefix_name)
+        normalized_name = self._normalize_prefix_name(request.prefix_name)
 
-        if self.prefix_repository.find_by_prefix_name(normalized_prefix_name):
+        if self.prefix_repository.find_by_prefix_name(normalized_name):
             raise PrefixAlreadyExistException()
 
         prefix = Prefix()
-        prefix.prefix_name = normalized_prefix_name
+        prefix.prefix_name = normalized_name
         prefix.required_prefix = True
         prefix.create_at = datetime.now()
 
@@ -46,10 +46,10 @@ class PrefixService:
     def update_prefix(self, request: PrefixUpdateRequest) -> PrefixResponse:
 
         if request.prefix_name is None or request.prefix_name == "":
-            raise ValueError("prefix is required")
+            raise PrefixRequiredException()
 
         with self.session.begin():
-         prefix = self.prefix_repository.find_by_prefix_name(self._normalize_prefix(request.prefix_name))
+         prefix = self.prefix_repository.find_by_prefix_name(self._normalize_prefix_name(request.prefix_name))
 
         if prefix is None:
             raise PrefixNotFoundException()
