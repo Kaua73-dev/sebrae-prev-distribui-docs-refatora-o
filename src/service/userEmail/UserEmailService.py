@@ -50,3 +50,13 @@ class UserEmailService:
         return self._to_response(use_email)
 
 
+    def delete_user_email(self, email: str) -> None:
+        if email is None or email == "":
+            raise UserEmailRequiredException()
+
+        with self.session.begin():
+            user_email = self.user_email_repository.find_by_email(email)
+            if user_email is None:
+                    raise UserEmailNotFoundException()
+
+        self.session.delete(user_email)

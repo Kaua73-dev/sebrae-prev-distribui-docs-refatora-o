@@ -29,3 +29,7 @@ class UserEmailRepository:
             .filter(UserEmail.email == email)
             .first()
         )
+
+    def delete(self, user_email: UserEmail) -> None:
+        self.db.delete(user_email)
+        self.db.commit()
