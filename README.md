@@ -4,6 +4,9 @@ Código de refatoração do projeto feito em java e implementação de novas fea
 
 ---
 
+> Detalhamento método por método do envio, com o Python explicado:
+> [`docs/dispatch-e-email.md`](docs/dispatch-e-email.md)
+
 ## O que o sistema faz
 
 Lê uma pasta com arquivos nomeados por prefixo de estado (`SP.pdf`, `SP.TXT`, `SP.XLSX`, `RJ.pdf`...),
