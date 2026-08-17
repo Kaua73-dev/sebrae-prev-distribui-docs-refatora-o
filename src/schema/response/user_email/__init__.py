@@ -1,3 +1,3 @@
-from .User_email_response import UserEmailResponse
+from .user_email_response import UserEmailResponse
 
 __all__ = ["UserEmailResponse"]

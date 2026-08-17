@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; color: #222; line-height: 1.5;">
+
+    {% if is_redirected %}
+    <p style="background: #fff3cd; border: 1px solid #e0a800; padding: 10px; border-radius: 4px;">
+        <strong>ENVIO DE TESTE.</strong> Em produção este email iria para
+        <strong>{{ intended_recipient }}</strong>.
+    </p>
+    {% endif %}
+
+    <p>Prezados,</p>
+
+    <p>Seguem em anexo os arquivos referentes ao prefixo <strong>{{ prefix_name }}</strong>.</p>
+
+    <ul>
+        {% for file_name in file_names %}
+        <li>{{ file_name }}</li>
+        {% endfor %}
+    </ul>
+
+    <p>Total de {{ file_names | length }} arquivo(s).</p>
+
+    <p style="color: #666; font-size: 12px; margin-top: 24px;">
+        Mensagem automática, favor não responder.
+    </p>
+
+</body>
+</html>

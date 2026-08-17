@@ -1,3 +1,3 @@
-from .User_email import UserEmail
+from .user_email import UserEmail
 
 __all__ = ["UserEmail"]

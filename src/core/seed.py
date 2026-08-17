@@ -4,7 +4,6 @@ from src.core.database import SessionLocal
 from src.model.prefix import Prefix
 from src.model.user_email import UserEmail
 
-# 26 estados + Distrito Federal
 BRAZILIAN_STATES = [
     "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
     "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
