@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class UserEmailResponse(BaseModel):
+    id: int
     user_email_name: EmailStr
     is_active: bool
     created_at: datetime

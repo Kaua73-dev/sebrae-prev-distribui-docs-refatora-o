@@ -2,6 +2,7 @@ from datetime import datetime
 
 from src.core.database import SessionLocal
 from src.model.prefix import Prefix
+from src.model.user_email import UserEmail
 
 # 26 estados + Distrito Federal
 BRAZILIAN_STATES = [
@@ -27,11 +28,36 @@ def seed_prefixes(db) -> int:
     return len(created)
 
 
+def seed_user_emails(db) -> int:
+    prefixes = db.query(Prefix).order_by(Prefix.prefix_name.asc()).all()
+    existing = {prefix_id for (prefix_id,) in db.query(UserEmail.prefix_id).all()}
+
+    created = [
+        UserEmail(
+            email=f"{prefix.prefix_name.lower()}@sebraeprev.com.br",
+            is_active=True,
+            create_at=datetime.now(),
+            prefix=prefix,
+        )
+        for prefix in prefixes
+        if prefix.id not in existing
+    ]
+
+    if created:
+        db.add_all(created)
+        db.commit()
+
+    return len(created)
+
+
 if __name__ == "__main__":
     db = SessionLocal()
     try:
         inserted = seed_prefixes(db)
         skipped = len(BRAZILIAN_STATES) - inserted
         print(f"{inserted} prefixo(s) inserido(s), {skipped} já existia(m).")
+
+        inserted_emails = seed_user_emails(db)
+        print(f"{inserted_emails} email(s) inserido(s).")
     finally:
         db.close()
