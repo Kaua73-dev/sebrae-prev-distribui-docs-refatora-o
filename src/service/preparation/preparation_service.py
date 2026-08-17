@@ -1,11 +1,13 @@
 from pathlib import Path
 from src.core.config import settings
+from src.repository.user_email import UserEmailRepository
 from src.service.preparation.file_block import FileBlock
 
 class PreparationService:
 
-    def __init__(self, prefix_service):
+    def __init__(self, prefix_service, user_email_repository: UserEmailRepository):
         self.prefix_service = prefix_service
+        self.user_email_repository = user_email_repository
 
 
     def mount_block_files(self) -> list[FileBlock]:
@@ -13,6 +15,10 @@ class PreparationService:
         all_files = self._get_files()
         prefixes_actives = self.prefix_service.find_prefix_required_true()
 
+        email_by_prefix = {
+            user_email.prefix.prefix_name: user_email.email
+            for user_email in self.user_email_repository.find_by_is_active_true()
+        }
 
         blocks = []
         for prefix in prefixes_actives:
@@ -21,13 +27,16 @@ class PreparationService:
                 for path in all_files
                 if self._belong_in_prefix(path.name, prefix.prefix_name)
             ]
-            blocks.append(FileBlock(prefix=prefix.prefix_name, files=files_of_block))
+            blocks.append(FileBlock(
+                prefix=prefix.prefix_name,
+                files=files_of_block,
+                email=email_by_prefix.get(prefix.prefix_name),
+            ))
         return blocks
 
     @staticmethod
     def _get_files() -> list[Path]:
         base_path = Path(settings.FILES_DIR_PATH)
-
 
         files_accepted = (".pdf", ".xls", ".xlsx", ".txt")
 
@@ -48,5 +57,3 @@ class PreparationService:
 
         next_char = file_name[len(prefix)]
         return not next_char.isalpha()
-
-

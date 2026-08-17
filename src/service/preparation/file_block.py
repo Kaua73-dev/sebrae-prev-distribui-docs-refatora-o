@@ -5,4 +5,4 @@ from pathlib import Path
 class FileBlock:
     prefix: str
     files: list[Path]
-    ##email: str
+    email: str | None = None

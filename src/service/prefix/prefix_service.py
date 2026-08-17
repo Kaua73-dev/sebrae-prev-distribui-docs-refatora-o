@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.exception.prefix.prefix_exceptions import PrefixAlreadyExistException, PrefixNotFoundException, PrefixRequiredException
+from src.exception.prefix.prefix_exception import PrefixAlreadyExistException, PrefixNotFoundException, PrefixRequiredException
 from src.model.prefix import Prefix
 from src.repository.prefix import PrefixRepository
 from src.schema.request.prefix import PrefixRequest

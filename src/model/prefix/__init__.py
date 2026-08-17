@@ -1,3 +1,3 @@
-from .prefix import Prefix
+from .Prefix import Prefix
 
 __all__ = ["Prefix"]
