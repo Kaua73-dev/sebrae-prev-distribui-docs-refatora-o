@@ -15,15 +15,21 @@ uvicorn src.main:app --reload
 
 | # | Método | Rota | Para quê |
 |---|---|---|---|
+| | | **Cadastro** | |
 | 1 | `POST` | `/prefix/create` | cadastra um prefixo (UF) |
 | 2 | `PUT` | `/prefix/update` | liga/desliga um prefixo |
 | 3 | `GET` | `/prefix/all` | lista todos os prefixos |
-| 4 | `GET` | `/preview` | espia os blocos sem gravar nada |
-| 5 | `POST` | `/start` | **preparação** — tira a foto e salva no banco |
-| 6 | `GET` | `/dispatch/{id}` | consulta a foto (blocos + avisos) |
-| 7 | `PATCH` | `/dispatch/{id}/block/{block_id}` | tira bloco / troca email antes de enviar |
-| 8 | `POST` | `/dispatch/{id}/e  xecute` | **envia** (202, roda em background) ⚠️ ver nota |
-| 9 | `GET` | `/dispatch/{id}/status` | acompanha o progresso |
+| 4 | `POST` | `/user-email/create` | vincula um email a um prefixo |
+| 5 | `PUT` | `/user-email/update` | altera email, prefixo ou ativação |
+| 6 | `GET` | `/user-email/all` | lista todos os emails |
+| 7 | `DELETE` | `/user-email/delete/{id}` | apaga um email |
+| | | **Envio** | |
+| 8 | `GET` | `/preview` | espia os blocos sem gravar nada |
+| 9 | `POST` | `/start` | **preparação** — tira a foto e salva no banco |
+| 10 | `GET` | `/dispatch/{id}` | consulta a foto (blocos + avisos) |
+| 11 | `PATCH` | `/dispatch/{id}/block/{block_id}` | tira bloco / troca email antes de enviar |
+| 12 | `POST` | `/dispatch/{id}/execute` | **envia** (202, roda em background) |
+| 13 | `GET` | `/dispatch/{id}/status` | acompanha o progresso |
 
 O fluxo real é sempre: **`/preview` → `/start` → conferir → `PATCH` → `execute` → `status`**.
 
@@ -138,7 +144,129 @@ curl http://localhost:8000/prefix/all
 
 ---
 
-## 4. `GET /preview`
+## 4. `POST /user-email/create`
+
+Vincula um email a um prefixo. É esse vínculo que o `/preview` e o `/start` leem pra descobrir
+o destinatário de cada bloco.
+
+O email é normalizado pra minúsculo e sem espaços. Nasce sempre com `is_active: true`.
+
+**Request**
+
+```json
+{ "user_email_name": "sp@sebraeprev.com.br", "prefix_name": "SP" }
+```
+
+| campo | tipo | regra |
+|---|---|---|
+| `user_email_name` | EmailStr | obrigatório, validado pelo Pydantic |
+| `prefix_name` | string | obrigatório, o prefixo precisa existir (normalizado pra maiúsculo) |
+
+**Response `200`**
+
+```json
+{
+  "id": 12,
+  "user_email_name": "sp@sebraeprev.com.br",
+  "is_active": true,
+  "created_at": "2026-08-18T15:00:00",
+  "prefix_name": "SP"
+}
+```
+
+⚠️ Repare que a **response** devolve `created_at` (com `d`), enquanto o resto do projeto usa
+`create_at`. A coluna no banco é `create_at`; o schema renomeia na saída.
+
+**Erros** — `404` prefixo não existe · `409` email já cadastrado (há `UNIQUE` na coluna) ·
+`422` email vazio/inválido ou prefixo vazio
+
+```bash
+curl -X POST http://localhost:8000/user-email/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_email_name":"sp@sebraeprev.com.br","prefix_name":"SP"}'
+```
+
+---
+
+## 5. `PUT /user-email/update`
+
+Altera um email existente. A chave é o **`id`**, não o email — então dá pra corrigir o
+endereço em si.
+
+**Request**
+
+```json
+{
+  "id": 12,
+  "user_email_name": "novo.sp@sebraeprev.com.br",
+  "prefix_name": "SP",
+  "is_active": true
+}
+```
+
+| campo | tipo | nota |
+|---|---|---|
+| `id` | int | obrigatório, identifica o registro |
+| `user_email_name` | EmailStr | obrigatório — mandar o valor atual se não for mudar |
+| `prefix_name` | string \| null | **opcional**: `null` ou `""` mantém o prefixo atual |
+| `is_active` | bool | obrigatório |
+
+`is_active: false` é o desligamento suave: o email continua no banco, mas some do
+`_email_by_prefix()`, e o bloco daquele prefixo passa a nascer sem destinatário — vira aviso
+de pré-voo em vez de envio errado.
+
+**Response `200`** — mesmo formato do `create`.
+
+**Erros** — `404` email ou prefixo não existe · `409` o novo endereço já pertence a outro
+registro · `422` payload inválido
+
+```bash
+curl -X PUT http://localhost:8000/user-email/update \
+  -H "Content-Type: application/json" \
+  -d '{"id":12,"user_email_name":"sp@sebraeprev.com.br","prefix_name":"SP","is_active":false}'
+```
+
+---
+
+## 6. `GET /user-email/all`
+
+Lista todos os emails com o prefixo já carregado (`join`, sem N+1). Ativos e inativos, sem
+paginação.
+
+**Response `200`**
+
+```json
+[
+  { "id": 1,  "user_email_name": "ac@sebraeprev.com.br", "is_active": true,  "created_at": "2026-08-13T10:00:00", "prefix_name": "AC" },
+  { "id": 12, "user_email_name": "sp@sebraeprev.com.br", "is_active": false, "created_at": "2026-08-13T10:00:00", "prefix_name": "SP" }
+]
+```
+
+```bash
+curl http://localhost:8000/user-email/all
+```
+
+---
+
+## 7. `DELETE /user-email/delete/{user_email_id}`
+
+Apaga o registro de vez. **Não tem soft delete aqui** — pra desativar sem perder o histórico,
+use o `is_active: false` do `update`.
+
+Um dispatch já criado não é afetado: o `intended_recipient` foi copiado pro bloco na
+preparação e não é relido do cadastro.
+
+**Response `204`** — sem corpo.
+
+**Erros** — `404` email não existe
+
+```bash
+curl -X DELETE http://localhost:8000/user-email/delete/12
+```
+
+---
+
+## 8. `GET /preview`
 
 Lê a pasta do `FILES_DIR_PATH`, agrupa os arquivos por prefixo ativo e devolve os blocos.
 **Não grava nada no banco.** É a rota segura pra conferir se os arquivos estão nomeados certo
@@ -179,7 +307,7 @@ curl http://localhost:8000/preview
 
 ---
 
-## 5. `POST /start`
+## 9. `POST /start`
 
 **A preparação.** Faz o mesmo agrupamento do `/preview`, mas **persiste** como um `Dispatch`
 com status `PREPARED` e um `DispatchBlock` por prefixo. Sem body.
@@ -246,7 +374,7 @@ curl -X POST http://localhost:8000/start
 
 ---
 
-## 6. `GET /dispatch/{id}`
+## 10. `GET /dispatch/{id}`
 
 Relê a foto. Mesmo formato do `/start`, com `warnings` recalculados na hora (menos o de
 arquivo órfão, ver acima). É aqui que o operador confere antes de mandar executar.
@@ -259,7 +387,7 @@ curl http://localhost:8000/dispatch/109
 
 ---
 
-## 7. `PATCH /dispatch/{id}/block/{block_id}`
+## 11. `PATCH /dispatch/{id}/block/{block_id}`
 
 A única rota de correção. Serve pra duas coisas: **tirar um bloco do envio** e **trocar o
 destinatário** — sem mexer no cadastro global de emails, só nesse dispatch.
@@ -297,16 +425,10 @@ curl -X PATCH http://localhost:8000/dispatch/109/block/3118 \
 
 ---
 
-## 8. `POST /dispatch/{id}/e  xecute`
+## 12. `POST /dispatch/{id}/execute`
 
 **A operação real.** Trava o dispatch (`RUNNING`), devolve `202` na hora e envia em
 background via `BackgroundTasks`. Sem body.
-
-> ⚠️ **BUG — a rota tem dois espaços no meio da palavra.** O path declarado em
-> [dispatch_controller.py:26](../src/api/dispatch/dispatch_controller.py#L26) é literalmente
-> `"/{dispatch_id}/e  xecute"`. Enquanto não for corrigido, o cliente precisa chamar
-> `/dispatch/109/e%20%20xecute` — `/dispatch/109/execute` devolve `404`.
-> A correção é apagar os dois espaços na string do decorator.
 
 O `202` volta **antes** do envio terminar: `finish_at` ainda é `null` e os blocos ainda estão
 `PENDING`. Use o `/status` pra acompanhar.
@@ -325,12 +447,12 @@ O `202` volta **antes** do envio terminar: `finish_at` ainda é `null` e os bloc
 chamada só reprocessa `PENDING` e `FAILED`. Bloco já entregue nunca sai duas vezes.
 
 ```bash
-curl -X POST "http://localhost:8000/dispatch/109/e%20%20xecute"
+curl -X POST http://localhost:8000/dispatch/109/execute
 ```
 
 ---
 
-## 9. `GET /dispatch/{id}/status`
+## 13. `GET /dispatch/{id}/status`
 
 Resposta enxuta pra polling durante o envio. Os contadores são sobre os blocos
 **incluídos**; `excluded` é o resto.
@@ -429,7 +551,7 @@ curl -X PATCH $BASE/dispatch/109/block/3132 \
   -H "Content-Type: application/json" -d '{"email":"novo.sp@sebraeprev.com.br"}'
 
 # 6. envia
-curl -X POST "$BASE/dispatch/109/e%20%20xecute"
+curl -X POST $BASE/dispatch/109/execute
 
 # 7. acompanha
 curl $BASE/dispatch/109/status
@@ -468,24 +590,16 @@ Valide que chegou, que o anexo abre e que o assunto mostra o destinatário real
 
 ---
 
-## O que ainda não tem rota
+## Populando o cadastro do zero
 
-O CRUD de `UserEmail` existe inteiro — [model](../src/model/user_email/user_email.py),
-[repository](../src/repository/user_email/user_email_repository.py),
-[service](../src/service/user_email/user_email_service.py) com `create` / `find` / `update` /
-`delete`, schemas e exceptions — **mas não tem controller**. O `get_user_email_service` está
-declarado em [dependencies.py:17](../src/core/dependencies.py#L17) e nenhum router o injeta.
-
-Na prática: **hoje só dá pra cadastrar email por seed ou direto no banco.** Não existe
-`POST /user-email`.
-
-O service já está pronto pra ser exposto; falta o
-`src/api/user_email/user_email_controller.py` no mesmo formato dos outros e o `include_router`
-no [main.py](../src/main.py).
-
-Enquanto isso, o caminho é o [seed.py](../src/core/seed.py), que popula as 27 UFs e um
-`{uf}@sebraeprev.com.br` pra cada:
+Dá pra montar prefixo e email um a um pelas rotas de cadastro, mas pra subir um ambiente novo
+o caminho é o [seed.py](../src/core/seed.py): ele cria as 27 UFs e um
+`{uf}@sebraeprev.com.br` pra cada.
 
 ```bash
 python -m src.core.seed
 ```
+
+É idempotente — roda quantas vezes quiser, só insere o que falta, e reporta quantos foram
+criados e quantos já existiam. Depois é só ajustar os endereços reais pelo
+`PUT /user-email/update`.
