@@ -19,10 +19,10 @@ uvicorn src.main:app --reload
 | 1 | `POST` | `/prefix/create` | cadastra um prefixo (UF) |
 | 2 | `PUT` | `/prefix/update` | liga/desliga um prefixo |
 | 3 | `GET` | `/prefix/all` | lista todos os prefixos |
-| 4 | `POST` | `/user-email/create` | vincula um email a um prefixo |
-| 5 | `PUT` | `/user-email/update` | altera email, prefixo ou ativação |
-| 6 | `GET` | `/user-email/all` | lista todos os emails |
-| 7 | `DELETE` | `/user-email/delete/{id}` | apaga um email |
+| 4 | `POST` | `/user_email/create` | vincula um email a um prefixo |
+| 5 | `PUT` | `/user_email/update` | altera email, prefixo ou ativação |
+| 6 | `GET` | `/user_email/all` | lista todos os emails |
+| 7 | `DELETE` | `/user_email/delete/{id}` | apaga um email |
 | | | **Envio** | |
 | 8 | `GET` | `/preview` | espia os blocos sem gravar nada |
 | 9 | `POST` | `/start` | **preparação** — tira a foto e salva no banco |
@@ -144,7 +144,7 @@ curl http://localhost:8000/prefix/all
 
 ---
 
-## 4. `POST /user-email/create`
+## 4. `POST /user_email/create`
 
 Vincula um email a um prefixo. É esse vínculo que o `/preview` e o `/start` leem pra descobrir
 o destinatário de cada bloco.
@@ -181,14 +181,14 @@ O email é normalizado pra minúsculo e sem espaços. Nasce sempre com `is_activ
 `422` email vazio/inválido ou prefixo vazio
 
 ```bash
-curl -X POST http://localhost:8000/user-email/create \
+curl -X POST http://localhost:8000/user_email/create \
   -H "Content-Type: application/json" \
   -d '{"user_email_name":"sp@sebraeprev.com.br","prefix_name":"SP"}'
 ```
 
 ---
 
-## 5. `PUT /user-email/update`
+## 5. `PUT /user_email/update`
 
 Altera um email existente. A chave é o **`id`**, não o email — então dá pra corrigir o
 endereço em si.
@@ -221,14 +221,14 @@ de pré-voo em vez de envio errado.
 registro · `422` payload inválido
 
 ```bash
-curl -X PUT http://localhost:8000/user-email/update \
+curl -X PUT http://localhost:8000/user_email/update \
   -H "Content-Type: application/json" \
   -d '{"id":12,"user_email_name":"sp@sebraeprev.com.br","prefix_name":"SP","is_active":false}'
 ```
 
 ---
 
-## 6. `GET /user-email/all`
+## 6. `GET /user_email/all`
 
 Lista todos os emails com o prefixo já carregado (`join`, sem N+1). Ativos e inativos, sem
 paginação.
@@ -243,12 +243,12 @@ paginação.
 ```
 
 ```bash
-curl http://localhost:8000/user-email/all
+curl http://localhost:8000/user_email/all
 ```
 
 ---
 
-## 7. `DELETE /user-email/delete/{user_email_id}`
+## 7. `DELETE /user_email/delete/{user_email_id}`
 
 Apaga o registro de vez. **Não tem soft delete aqui** — pra desativar sem perder o histórico,
 use o `is_active: false` do `update`.
@@ -261,7 +261,7 @@ preparação e não é relido do cadastro.
 **Erros** — `404` email não existe
 
 ```bash
-curl -X DELETE http://localhost:8000/user-email/delete/12
+curl -X DELETE http://localhost:8000/user_email/delete/12
 ```
 
 ---
@@ -602,4 +602,4 @@ python -m src.core.seed
 
 É idempotente — roda quantas vezes quiser, só insere o que falta, e reporta quantos foram
 criados e quantos já existiam. Depois é só ajustar os endereços reais pelo
-`PUT /user-email/update`.
+`PUT /user_email/update`.
