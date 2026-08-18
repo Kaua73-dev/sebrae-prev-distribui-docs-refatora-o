@@ -4,3 +4,7 @@ venv/
 __pycache__/
 *.pyc
 docs
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
