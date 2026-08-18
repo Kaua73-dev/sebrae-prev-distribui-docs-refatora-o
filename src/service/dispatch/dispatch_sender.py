@@ -16,6 +16,11 @@ class DispatchSender:
     def __init__(self, mail_service: MailService | None = None):
         self.mail_service = mail_service or MailService()
 
+
+
+
+
+
     async def send(self, dispatch_id: int) -> None:
         with new_session() as session:
             repository = DispatchRepository(session)

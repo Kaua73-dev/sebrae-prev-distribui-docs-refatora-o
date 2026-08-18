@@ -6,6 +6,9 @@ Código de refatoração do projeto feito em java e implementação de novas fea
 
 > Detalhamento método por método do envio, com o Python explicado:
 > [`docs/dispatch-e-email.md`](docs/dispatch-e-email.md)
+>
+> Todas as rotas, com request, response e erros:
+> [`docs/api-rotas.md`](docs/api-rotas.md)
 
 ## O que o sistema faz
 
