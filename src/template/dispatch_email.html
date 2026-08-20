@@ -2,31 +2,132 @@
 <html lang="pt-br">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sebrae Prev</title>
 </head>
-<body style="font-family: Arial, Helvetica, sans-serif; color: #222; line-height: 1.5;">
+<body style="margin: 0; padding: 0; background-color: #EDEDED; font-family: Arial, Helvetica, sans-serif; color: #100C08;">
 
-    {% if is_redirected %}
-    <p style="background: #fff3cd; border: 1px solid #e0a800; padding: 10px; border-radius: 4px;">
-        <strong>ENVIO DE TESTE.</strong> Em produção este email iria para
-        <strong>{{ intended_recipient }}</strong>.
-    </p>
-    {% endif %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #EDEDED;">
+    <tr>
+        <td align="center" style="padding: 32px 12px;">
 
-    <p>Prezados,</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600"
+                   style="width: 600px; max-width: 600px; background-color: #FFFFFF;">
 
-    <p>Seguem em anexo os arquivos referentes ao prefixo <strong>{{ prefix_name }}</strong>.</p>
+                <tr>
+                    <td style="background-color: #1517B3; padding: 20px 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="color: #FFFFFF; font-size: 14px; font-weight: bold; letter-spacing: 1.5px;">
+                                    SEBRAE PREVID&Ecirc;NCIA
+                                </td>
+                                <td align="right" style="color: #FFFFFF; font-size: 12px; letter-spacing: 0.5px;">
+                                    {{ reference_period }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 
-    <ul>
-        {% for file_name in file_names %}
-        <li>{{ file_name }}</li>
-        {% endfor %}
-    </ul>
+                {% if is_redirected %}
+                <tr>
+                    <td style="padding: 28px 32px 0 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="background-color: #EDEDED; border-left: 3px solid #1517B3;">
+                            <tr>
+                                <td style="padding: 14px 16px;">
+                                    <p style="margin: 0 0 8px 0; color: #1517B3; font-size: 11px; font-weight: bold; letter-spacing: 1px;">
+                                        AMBIENTE DE TESTE
+                                    </p>
+                                    <p style="margin: 0; color: #100C08; font-size: 13px; line-height: 1.6;">
+                                        Em produ&ccedil;&atilde;o, esta mensagem seria enviada para
+                                        <strong>{{ intended_recipient }}</strong>.
+                                        Nesta rodada foi redirecionada para
+                                        <strong>{{ actual_recipient }}</strong>.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
 
-    <p>Total de {{ file_names | length }} arquivo(s).</p>
+                <tr>
+                    <td style="padding: 32px 32px 0 32px;">
+                        <p style="margin: 0 0 18px 0; font-size: 15px; line-height: 1.6;">
+                            Prezados,
+                        </p>
+                        <p style="margin: 0 0 28px 0; font-size: 15px; line-height: 1.7;">
+                            Seguem em anexo os documentos referentes ao prefixo
+                            <strong>{{ prefix_name }}</strong>, com per&iacute;odo de refer&ecirc;ncia
+                            <strong>{{ reference_period }}</strong>.
+                        </p>
+                    </td>
+                </tr>
 
-    <p style="color: #666; font-size: 12px; margin-top: 24px;">
-        Mensagem automática, favor não responder.
-    </p>
+                <tr>
+                    <td style="padding: 0 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="border-top: 2px solid #1517B3; border-bottom: 1px solid #A6A8B0;">
+                            <tr>
+                                <td width="50%" style="padding: 14px 0;">
+                                    <p style="margin: 0 0 4px 0; color: #A6A8B0; font-size: 11px; letter-spacing: 1px;">
+                                        PREFIXO
+                                    </p>
+                                    <p style="margin: 0; color: #071F59; font-size: 15px; font-weight: bold;">
+                                        {{ prefix_name }}
+                                    </p>
+                                </td>
+                                <td width="50%" style="padding: 14px 0;">
+                                    <p style="margin: 0 0 4px 0; color: #A6A8B0; font-size: 11px; letter-spacing: 1px;">
+                                        DOCUMENTOS ANEXADOS
+                                    </p>
+                                    <p style="margin: 0; color: #071F59; font-size: 15px; font-weight: bold;">
+                                        {{ file_names | length }}
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 24px 32px 0 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            {% for file_name in file_names %}
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; line-height: 1.5; word-break: break-all;
+                                           {% if not loop.last %}border-bottom: 1px solid #EDEDED;{% endif %}">
+                                    {{ file_name }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 32px 32px 36px 32px;">
+                        <p style="margin: 0; font-size: 15px; line-height: 1.7;">
+                            Atenciosamente,<br>
+                            <strong style="color: #1517B3;">SEBRAE Previd&ecirc;ncia</strong>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #EDEDED; padding: 18px 32px;">
+                        <p style="margin: 0; color: #071F59; font-size: 11px; line-height: 1.6;">
+                            Mensagem autom&aacute;tica gerada em {{ reference_period }}. Favor n&atilde;o responder.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

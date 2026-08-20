@@ -1,0 +1,12 @@
+# Dependencias que so existem na sua maquina e no CI — nunca vao para producao.
+# Instalar com:  pip install -r requirements-dev.txt
+#
+# Estao separadas do requirements.txt de proposito: o servidor que roda a API nao
+# precisa (nem deve) ter pytest instalado.
+
+pytest==9.1.1
+pytest-asyncio==1.4.0
+
+# Opcionais, ja instalados no venv:
+pytest-cov==7.1.0      # relatorio de cobertura:  pytest --cov=src
+pytest-watch==4.2.0    # re-roda a suite a cada save:  ptw

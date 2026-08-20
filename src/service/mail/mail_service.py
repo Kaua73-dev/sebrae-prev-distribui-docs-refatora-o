@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
@@ -23,6 +24,7 @@ connection_config = ConnectionConfig(
 class MailService:
 
     TEMPLATE_NAME = "dispatch_email.html"
+    REFERENCE_PERIOD_FORMAT = "%Y/%m"
 
     def __init__(self, mail: FastMail | None = None):
         self.mail = mail or FastMail(connection_config)
@@ -49,11 +51,17 @@ class MailService:
                 "prefix_name": prefix_name,
                 "file_names": [file.name for file in files],
                 "intended_recipient": intended_recipient,
+                "actual_recipient": actual_recipient,
                 "is_redirected": settings.mail_is_redirected,
+                "reference_period": self._reference_period(),
             },
             subtype=MessageType.html,
             attachments=[str(file) for file in files],
         )
+
+    @classmethod
+    def _reference_period(cls) -> str:
+        return datetime.now().strftime(cls.REFERENCE_PERIOD_FORMAT)
 
     @staticmethod
     def _build_subject(prefix_name: str, intended_recipient: str) -> str:
