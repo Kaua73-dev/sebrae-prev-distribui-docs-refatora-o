@@ -355,7 +355,7 @@ Tudo que **não** vai sair, listado pro operador antes de executar:
 
 | aviso | quando |
 |---|---|
-| `AC: sem email cadastrado, nao sera enviado` | prefixo sem `user_email` ativo |
+| `AC: sem email cadastrado, nao sera enviado` | prefixo sem `self` ativo |
 | `AC: nenhum arquivo encontrado` | bloco vazio |
 | `AC: 2 arquivo(s) sumiram da pasta desde a preparacao` | arquivo apagado depois do `/start` |
 | `AC: anexos somam 24.3MB, acima do limite de 20MB` | passou do `MAIL_MAX_ATTACHMENT_MB` |

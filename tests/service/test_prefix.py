@@ -114,16 +114,3 @@ class TestPrefix:
         assert response[0].required_prefix is True
         prefix_repository_mock.find_by_required_prefix_true_order_by_name.assert_called_once()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
