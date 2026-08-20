@@ -26,9 +26,6 @@ class PrefixService:
 
     def create_prefix(self, request: PrefixRequest) -> PrefixResponse:
 
-        if request.prefix_name is None or request.prefix_name == "":
-            raise PrefixRequiredException()
-
         normalized_name = self._normalize_prefix_name(request.prefix_name)
 
         if self.prefix_repository.find_by_prefix_name(normalized_name):
@@ -44,9 +41,6 @@ class PrefixService:
         return self._to_response(prefix)
 
     def update_prefix(self, request: PrefixUpdateRequest) -> PrefixResponse:
-
-        if request.prefix_name is None or request.prefix_name == "":
-            raise PrefixRequiredException()
 
         with self.session.begin():
          prefix = self.prefix_repository.find_by_prefix_name(self._normalize_prefix_name(request.prefix_name))

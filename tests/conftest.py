@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 
 import pytest
 
@@ -11,7 +11,7 @@ def prefix_repository_mock():
 
 @pytest.fixture
 def session_mock():
-    return Mock()
+    return MagicMock()
 
 @pytest.fixture
 def prefix_service(prefix_repository_mock: Mock, session_mock: Mock):
