@@ -30,6 +30,11 @@ os.environ.setdefault("DB_USER", "test")
 os.environ.setdefault("DB_PASSWORD", "test")
 os.environ.setdefault("DB_ECHO", "false")
 
+# JWT_SECRET e obrigatorio no Settings. Valor fixo aqui: os testes nao validam token
+# contra nada externo, so precisam que o encode/decode feche com o mesmo segredo.
+# Precisa de 32+ bytes: abaixo disso o pyjwt emite InsecureKeyLengthWarning (RFC 7518).
+os.environ.setdefault("JWT_SECRET", "segredo-de-teste-com-32-bytes-ou-mais-nao-usar-em-producao")
+
 # --------------------------------------------------------------------------------------
 # Travas de seguranca. Aqui e atribuicao direta, NAO setdefault — de proposito.
 #
