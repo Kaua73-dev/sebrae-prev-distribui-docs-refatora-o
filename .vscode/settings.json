@@ -1,4 +1,18 @@
 {
     "python.REPL.enableREPLSmartSend": false,
-    "explorer.compactFolders": true
+    "explorer.compactFolders": true,
+
+    // Interpretador do venv do projeto. Sem isso o VSCode pode usar o Python
+    // global, que nao tem pytest nem as dependencias de src.
+    "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe",
+
+    // Habilita o Test Explorer (o icone de bequer na barra lateral) com pytest.
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+
+    // "tests" e redundante com o testpaths do pytest.ini, mas evita que o
+    // VSCode passe "." e tente coletar arquivos fora de tests/.
+    "python.testing.pytestArgs": [
+        "tests"
+    ]
 }
