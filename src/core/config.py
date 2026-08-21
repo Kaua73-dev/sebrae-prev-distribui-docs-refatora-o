@@ -13,6 +13,14 @@ class Settings(BaseSettings):
 
     FILES_DIR_PATH: str
 
+    # Sem default de proposito: subir a aplicacao sem JWT_SECRET no .env tem que
+    # falhar na hora, e nao rodar com um segredo previsivel em producao.
+    JWT_SECRET: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_MINUTES: int = 480
+
+    CORS_ORIGINS: str = "*"
+
     MAIL_HOST: str = ""
     MAIL_PORT: int = 587
     MAIL_USERNAME: str = ""
@@ -27,6 +35,10 @@ class Settings(BaseSettings):
     MAIL_MAX_ATTACHMENT_MB: int = 20
 
     model_config = SettingsConfigDict(env_file=".env")
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
     @property
     def mail_is_redirected(self) -> bool:

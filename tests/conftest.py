@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, Mock, MagicMock
 import pytest
 
 from src.service.dispatch.dispatch_service import DispatchService
+from src.service.user import UserService
 from src.service.mail import MailService
 from src.service.user_email import UserEmailService
 from src.service.prefix.prefix_service import PrefixService
@@ -71,3 +72,13 @@ def preparation_service_mock():
 @pytest.fixture
 def dispatch_service(dispatch_repository_mock: Mock, preparation_service_mock: Mock, session_mock: MagicMock):
     return DispatchService(dispatch_repository=dispatch_repository_mock, preparation_service=preparation_service_mock, session=session_mock)
+
+
+@pytest.fixture
+def user_repository_mock():
+    return Mock()
+
+
+@pytest.fixture
+def user_service(user_repository_mock: Mock, session_mock: MagicMock):
+    return UserService(user_repository=user_repository_mock, session=session_mock)
